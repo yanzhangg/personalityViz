@@ -23,7 +23,7 @@ class Scatterplot {
       vis.config.margin.bottom;
 
     // Initialize ordinal scale
-    vis.xScale = d3.scalePoint().range([0, vis.width]);
+    vis.xScale = d3.scaleLinear().range([0, vis.width]);
 
     // Initialize categorical scale
     vis.yScale = d3.scaleBand().range([0, vis.height]);
@@ -105,7 +105,7 @@ class Scatterplot {
 
     // Specify domain for y-axis
     vis.yScale.domain(movieGenres); //TODO: change this to a function
-    vis.xScale.domain(ipipScores);
+    vis.xScale.domain([4, 20]);
 
     vis.renderVis();
   }
@@ -124,7 +124,7 @@ class Scatterplot {
       .data((d) => d.values)
       .join("circle")
       .attr("class", "point")
-      .attr("r", 8)
+      .attr("r", 5)
       .attr("cy", (d) => vis.yScale(vis.yValue(d)))
       .attr("cx", (d) => vis.xScale(vis.xValue(d)))
       .attr("fill", (d) => vis.colorScale(vis.colorValue(d)))

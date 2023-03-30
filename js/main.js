@@ -88,11 +88,11 @@ d3.csv("data/data.csv")
         values: data.map((d) => {
           return {
             name: group,
-            ipip_O: d.IPIP_O_ordinal,
-            ipip_C: d.IPIP_C_ordinal,
-            ipip_E: d.IPIP_E_ordinal,
-            ipip_A: d.IPIP_A_ordinal,
-            ipip_N: d.IPIP_N_ordinal,
+            ipip_O: d.IPIP_O,
+            ipip_C: d.IPIP_C,
+            ipip_E: d.IPIP_E,
+            ipip_A: d.IPIP_A,
+            ipip_N: d.IPIP_N,
             pref: +d[group],
           };
         }),
@@ -105,11 +105,11 @@ d3.csv("data/data.csv")
         values: data.map((d) => {
           return {
             name: group,
-            ipip_O: d.IPIP_O_ordinal,
-            ipip_C: d.IPIP_C_ordinal,
-            ipip_E: d.IPIP_E_ordinal,
-            ipip_A: d.IPIP_A_ordinal,
-            ipip_N: d.IPIP_N_ordinal,
+            ipip_O: d.IPIP_O,
+            ipip_C: d.IPIP_C,
+            ipip_E: d.IPIP_E,
+            ipip_A: d.IPIP_A,
+            ipip_N: d.IPIP_N,
             pref: +d[group],
           };
         }),
@@ -119,10 +119,19 @@ d3.csv("data/data.csv")
     console.log(bookGenresData);
 
     // Initialize scatterplot
-    const scatterplot = new Scatterplot(
-      { parentElement: "#scatterplot" },
+    // const scatterplot = new Scatterplot(
+    //   { parentElement: "#scatterplot" },
+    //   movieGenresData
+    // );
+    // scatterplot.updateVis();
+
+    // Initialize heatmap
+    const heatmap = new Heatmap(
+      {
+        parentElement: "#heatmap",
+      },
       movieGenresData
     );
-    scatterplot.updateVis();
+    heatmap.updateVis();
   })
   .catch((error) => console.error(error));
