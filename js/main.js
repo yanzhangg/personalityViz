@@ -132,6 +132,16 @@ d3.csv("data/data.csv")
       },
       movieGenresData
     );
+
+    // Initialize circular barplot
+    const circularbarplot = new CircularBarplot(
+      {
+        parentElement: "#circularbarplot",
+      },
+      movieGenresData
+    );
+
     heatmap.updateVis();
+    circularbarplot.updateVis();
   })
   .catch((error) => console.error(error));
