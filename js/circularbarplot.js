@@ -43,33 +43,38 @@ class CircularBarplot {
             .append("g")
             .attr(
                 "transform",
-                `translate(${vis.config.margin.left},${vis.config.margin.top})`
+                `translate(${vis.config.margin.left + 50},${vis.config.margin.top + 80})`
             );
 
         vis.chart = vis.chartArea.append("g");
 
+        // Append axis title
+        vis.chartArea.append('text')
+            .attr('class', 'y-axis-title')
+            .attr('x', -50)
+            .attr('y', 120)
+            .attr('dy', '1em')
+            .text('Conscientiousness')
+            .style('font-size', '12px');
+
         // Initialize scales
 
-        vis.xScale = d3.scaleBand().range([0, 2 * Math.PI]);
+        vis.xScale = d3.scaleBand().range([0, 2 * Math.PI]).align(0);
 
         vis.yScale = d3.scaleRadial().range([vis.innerRadius, vis.outerRadius]).domain([0, d3.max(vis.data, d => d.ipip_0)]);
 
         // Initialize x-axis
-        vis.xAxis = d3.axisBottom(vis.xScale).ticks(6).tickSize(0).tickPadding(10);
+        // vis.xAxis = d3.axisBottom(vis.xScale);
 
-        vis.yAxis = d3
-            .axisLeft(vis.yScale)
-            .tickSize(0)
-            .tickPadding(10)
-            .tickFormat((d) => d.substring(0, d.length - 3));
+        // vis.yAxis = d3.axisLeft(vis.yScale);
 
         // Append empty x-axis group and move it to the bottom of the chart
-        vis.xAxisG = vis.chartArea
-            .append("g")
-            .attr("class", "axis x-axis")
-            .attr("transform", `translate(0,${vis.config.height})`);
+        // vis.xAxisG = vis.chartArea
+        //     .append("g")
+        //     .attr("class", "axis x-axis")
+        //     .attr("transform", `translate(0,${vis.config.height})`);
 
-        vis.yAxisG = vis.chartArea.append("g").attr("class", "axis y-axis");
+        // vis.yAxisG = vis.chartArea.append("g").attr("class", "axis y-axis");
 
         vis.updateVis();
     }
@@ -105,9 +110,9 @@ class CircularBarplot {
             .attr("fill", "#69b3a2")
             .attr("d", d3.arc()
                 .innerRadius(vis.innerRadius)
-                .outerRadius(function (d) { return y(d['Value']); })
-                .startAngle(function (d) { return x(d.ipip_0); })
-                .endAngle(function (d) { return x(d.ipip_0) + xScale.bandwidth(); })
+                .outerRadius(function (d) { return d3.max(vis.data, d.ipip_0); })
+                .startAngle(function (d) { return vis.xScale(d.ipip_0); })
+                .endAngle(function (d) { return vis.xScale(d.ipip_0) + vis.xScale.bandwidth(); })
                 .padAngle(0.01)
                 .padRadius(vis.innerRadius))
 
@@ -117,16 +122,16 @@ class CircularBarplot {
             .data(vis.data)
             .enter()
             .append("g")
-            .attr("text-anchor", function (d) { return (x(d.name) + xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
-            .attr("transform", function (d) { return "rotate(" + ((x(d.name) + xScale.bandwidth() / 2) * 180 / Math.PI - 90) + ")" + "translate(" + (y(d['Value']) + 10) + ",0)"; })
+            .attr("text-anchor", function (d) { return (vis.xScale(d.name) + vis.xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
+            .attr("transform", function (d) { return "rotate(" + ((vis.xScale(d.name) + vis.xScale.bandwidth() / 2) * 180 / Math.PI - 90) + ")" + "translate(" + (60) + ",0)"; })
             .append("text")
             .text(function (d) { return (d.name) })
-            .attr("transform", function (d) { return (x(d.name) + xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+            .attr("transform", function (d) { return (vis.xScale(d.name) + vis.xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
             .style("font-size", "11px")
             .attr("alignment-baseline", "middle")
 
         // Update axis
-        vis.xAxisG.call(vis.xAxis);
-        vis.yAxisG.call(vis.yAxis);
+        // vis.xAxisG.call(vis.xAxis);
+        // vis.yAxisG.call(vis.yAxis);
     }
 }
