@@ -172,15 +172,6 @@ class Heatmap {
     // Exit
     row.exit().remove();
 
-    // Append row label (y-axis)
-    // rowEnter
-    //   .append("text")
-    //   .attr("class", "h-label")
-    //   .attr("text-anchor", "end")
-    //   .attr("dy", "0.85em")
-    //   .attr("x", -8)
-    //   .text(vis.yValue);
-
     // 2. Level: columns
 
     // 2a) Actual cells
@@ -219,24 +210,6 @@ class Heatmap {
     //     d3.select("#tooltip").style("display", "none");
     //   });
 
-    // 2b) Diagonal lines for NA values
-    // const cellNa = row
-    //   .merge(rowEnter)
-    //   .selectAll(".h-cell-na")
-    //   .data((d) => d[1].filter((k) => k.value === null));
-
-    // const cellNaEnter = cellNa
-    //   .enter()
-    //   .append("line")
-    //   .attr("class", "h-cell-na");
-
-    // cellNaEnter
-    //   .merge(cellNa)
-    //   .attr("x1", (d) => vis.xScale(vis.xValue(d)))
-    //   .attr("x2", (d) => vis.xScale(vis.xValue(d)) + cellWidth)
-    //   .attr("y1", vis.yScale.bandwidth())
-    //   .attr("y2", 0);
-
     // Update axis
     vis.xAxisG.call(vis.xAxis);
     vis.yAxisG.call(vis.yAxis);
@@ -249,7 +222,6 @@ class Heatmap {
   //     const vis = this;
 
   //     // Add stops to the gradient
-  //     // Learn more about gradients: https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient
   //     vis.legendColorGradient
   //       .selectAll("stop")
   //       .data(vis.colorScale.range())

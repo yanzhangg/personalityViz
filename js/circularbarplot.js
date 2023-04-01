@@ -7,12 +7,12 @@ class CircularBarplot {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 500,
-            containerHeight: _config.containerHeight || 500,
+            containerWidth: _config.containerWidth || 1000,
+            containerHeight: _config.containerHeight || 800,
             tooltipPadding: 15,
-            margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 120 },
+            margin: _config.margin || { top: 300, right: 50, bottom: 200, left: 500 },
             innerRadius: 80,
-            outerRadius: Math.min(this.containerWidth, this.containerHeight) / 2
+            outerRadius: Math.min(_config.containerWidth, _config.containerHeight) / 2
         };
         this.data = _data;
         this.initVis();
@@ -48,33 +48,22 @@ class CircularBarplot {
 
         vis.chart = vis.chartArea.append("g");
 
-        // Append axis title
+        // Append title
         vis.chartArea.append('text')
-            .attr('class', 'y-axis-title')
+            .attr('class', 'title')
             .attr('x', -50)
             .attr('y', 120)
             .attr('dy', '1em')
-            .text('Conscientiousness')
+            .text('Openness')
             .style('font-size', '12px');
 
         // Initialize scales
+        vis.xScale = d3.scaleBand()
+            .range([0, 2 * Math.PI])
+            .align(0);
 
-        vis.xScale = d3.scaleBand().range([0, 2 * Math.PI]).align(0);
-
-        vis.yScale = d3.scaleRadial().range([vis.innerRadius, vis.outerRadius]).domain([0, d3.max(vis.data, d => d.ipip_0)]);
-
-        // Initialize x-axis
-        // vis.xAxis = d3.axisBottom(vis.xScale);
-
-        // vis.yAxis = d3.axisLeft(vis.yScale);
-
-        // Append empty x-axis group and move it to the bottom of the chart
-        // vis.xAxisG = vis.chartArea
-        //     .append("g")
-        //     .attr("class", "axis x-axis")
-        //     .attr("transform", `translate(0,${vis.config.height})`);
-
-        // vis.yAxisG = vis.chartArea.append("g").attr("class", "axis y-axis");
+        vis.yScale = d3.scaleRadial()
+            .range([vis.innerRadius, vis.outerRadius]);
 
         vis.updateVis();
     }
@@ -86,12 +75,15 @@ class CircularBarplot {
         const vis = this;
 
         // Specificy accessor functions
-        vis.xValue = (d) => d.name;
-        vis.yValue = (d) => d.ipip_O;
+        // vis.xValue = (d) => d.name;
+        // vis.yValue = (d) => d.sum;
+        
+        // Set the scale input domain
+        vis.xScale.domain(vis.data.map(function (d) {
+            return d.name;
+        }));
 
-        // Set the scale input domains
-        vis.xScale.domain(movieGenres);
-        vis.yScale.domain([7, 21]);
+        vis.yScale.domain([0, 400]);// TODO: find max
 
         vis.renderVis();
     }
@@ -101,20 +93,24 @@ class CircularBarplot {
     renderVis() {
         const vis = this;
 
+        console.log(vis.data);
+
         // Add bars
         vis.chart
             .selectAll(".path")
             .data(vis.data)
             .enter()
             .append("path")
+            .attr("class", 'path')
             .attr("fill", "#69b3a2")
             .attr("d", d3.arc()
                 .innerRadius(vis.innerRadius)
-                .outerRadius(function (d) { return d3.max(vis.data, d.ipip_0); })
-                .startAngle(function (d) { return vis.xScale(d.ipip_0); })
-                .endAngle(function (d) { return vis.xScale(d.ipip_0) + vis.xScale.bandwidth(); })
+                .outerRadius(d => d.sum)
+                // .outerRadius(d => vis.yScale(d.sum))
+                .startAngle(d => vis.xScale(d.name))
+                .endAngle(d => vis.xScale(d.name) + vis.xScale.bandwidth())
                 .padAngle(0.01)
-                .padRadius(vis.innerRadius))
+                .padRadius(vis.innerRadius));
 
         // Add genre labels
         vis.chart.append("g")
@@ -123,15 +119,12 @@ class CircularBarplot {
             .enter()
             .append("g")
             .attr("text-anchor", function (d) { return (vis.xScale(d.name) + vis.xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
-            .attr("transform", function (d) { return "rotate(" + ((vis.xScale(d.name) + vis.xScale.bandwidth() / 2) * 180 / Math.PI - 90) + ")" + "translate(" + (60) + ",0)"; })
+            .attr("transform", function (d) { 
+                return "rotate(" + ((vis.xScale(d.name) + vis.xScale.bandwidth() / 2) * 180 / Math.PI - 90) + ")" + "translate(" + (d.sum + 10) + ",0)"; })
             .append("text")
-            .text(function (d) { return (d.name) })
+            .text(function (d) { return (d.name.substring(0, d.name.length - 3)) })
             .attr("transform", function (d) { return (vis.xScale(d.name) + vis.xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
             .style("font-size", "11px")
-            .attr("alignment-baseline", "middle")
-
-        // Update axis
-        // vis.xAxisG.call(vis.xAxis);
-        // vis.yAxisG.call(vis.yAxis);
+            .attr("alignment-baseline", "middle");
     }
 }

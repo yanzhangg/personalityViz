@@ -51,15 +51,9 @@ const bookGenres = [
   "Medical_27",
 ];
 
-const ipipScores = [
-  "Extremely Low",
-  "Very Low",
-  "Low",
-  "Neither high nor low",
-  "High",
-  "Very High",
-  "Extremely High",
-];
+const traits = [
+  "O",
+]
 
 /**
  * Load data from CSV file asynchronously and render charts
@@ -75,7 +69,7 @@ d3.csv("data/data.csv")
           attr != "IPIP_E_ordinal" &&
           attr != "IPIP_A_ordinal" &&
           attr != "IPIP_N_ordinal" &&
-          attr != "Highest Scoring Trait"
+          attr != "Highest_Scoring_Trait"
         ) {
           d[attr] = +d[attr];
         }
@@ -110,20 +104,31 @@ d3.csv("data/data.csv")
             ipip_E: d.IPIP_E,
             ipip_A: d.IPIP_A,
             ipip_N: d.IPIP_N,
+            maxTrait: d.Highest_Scoring_Trait,
             pref: +d[group],
           };
         }),
       };
     });
 
-    console.log(bookGenresData);
+   // Group data by highest scoring trait
+   const dataByHighestScoringTrait = d3.group(data, d => d.Highest_Scoring_Trait);
 
-    // Initialize scatterplot
-    // const scatterplot = new Scatterplot(
-    //   { parentElement: "#scatterplot" },
-    //   movieGenresData
-    // );
-    // scatterplot.updateVis();
+   // Get sum
+   let sums = [];
+   let sumObj = {};
+   let totalSums = [];
+   movieGenres.forEach(genre => {
+       let sum = d3.rollup(dataByHighestScoringTrait.get("O"), v => d3.sum(v, d => d[genre]));
+       totalSums.push(sum);
+
+       sumObj = {
+           name: genre,
+           sum
+       };
+       sums.push(sumObj);
+   });
+   console.log(totalSums);
 
     // Initialize heatmap
     const heatmap = new Heatmap(
@@ -138,7 +143,7 @@ d3.csv("data/data.csv")
       {
         parentElement: "#circularbarplot",
       },
-      movieGenresData
+      sums
     );
 
     heatmap.updateVis();
