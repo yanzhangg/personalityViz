@@ -8,10 +8,28 @@
 </head>
 <body>    
     <!-- Add HTML content, SVG drawing area, ... -->
+    <h1 style="padding-left: 20px">The Big Five Personality Traits & Media Preferences</h1>
+
+    <div style="padding-left: 20px">Filter by Personality Trait: 
+    <select id="trait-selector">
+        <option value="ipip_O">Openness</option>
+        <option value="ipip_C">Conscientiousness</option>
+        <option value="ipip_E">Extraversion</option>
+        <option value="ipip_A">Agreeableness</option>
+        <option value="ipip_N">Neuroticism</option>
+    </select>
+    </div>
+
     <div class="container">
-        <!-- <div><svg id="scatterplot"></svg></div> -->
         <div><svg id="heatmap"></svg></div>
-        <div><svg id="circularbarplot"></svg></div>
+        <div class="barplots">
+            <div><svg id="o-circularbarplot"></svg></div>
+            <div><svg id="c-circularbarplot"></svg></div>
+            <div><svg id="e-circularbarplot"></svg></div>
+            <div><svg id="a-circularbarplot"></svg></div>
+            <div><svg id="n-circularbarplot"></svg></div>
+        </div>
+        <div id="tooltip"></div>
     </div>
     
     <!-- D3 bundle -->
@@ -20,8 +38,8 @@
     <!-- Our JS code -->
     <script src="js/main.js"></script>
 
-    <script src="js/scatterplot.js"></script>
     <script src="js/circularbarplot.js"></script>
     <script src="js/heatmap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.13.0/d3-legend.js"></script>
 </body>
 </html>

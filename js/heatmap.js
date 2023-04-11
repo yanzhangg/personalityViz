@@ -4,17 +4,18 @@ class Heatmap {
    * @param {Object}
    * @param {Array}
    */
-  constructor(_config, _data) {
+  constructor(_config, _data, _trait) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 1000,
       tooltipPadding: 15,
-      margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 120 },
-      //   legendWidth: 160,
-      //   legendBarHeight: 10,
+      margin: _config.margin || { top: 50, right: 50, bottom: 250, left: 120 },
+      legendWidth: 160,
+      legendBarHeight: 10,
     };
     this.data = _data;
+    this.trait = _trait;
     this.initVis();
   }
 
@@ -49,11 +50,42 @@ class Heatmap {
 
     vis.chart = vis.chartArea.append("g");
 
+    var keys = ["Strongly Dislike", "Dislike", "Neutral", "Like", "Strongly Like"];
+    var legendcolor = ["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"];
+
     // Initialize scales
     // vis.colorScale = d3.scaleSequential().interpolator(d3.interpolateReds);
     vis.colorScale = d3
       .scaleOrdinal()
       .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
+
+    vis.legendScale = d3
+      .scaleOrdinal()
+      .domain(keys)
+      .range(legendcolor);
+
+    vis.chart.selectAll("rects")
+      .data(keys)
+      .enter()
+      .append("rect")
+        .attr("x", 10)
+        .attr("y", function(d,i) { return 100 + i*(25) + 750})
+        .attr("width", 20)
+        .attr("height", 20)
+        .style("fill", function(d){ return vis.legendScale(d)})
+
+    vis.chart.selectAll("label")
+        .data(keys)
+        .enter()
+        .append("text")
+        .attr("x", 100 + 20*1.2)
+        .attr("y", function(d,i){ return 100 + i*(25) + (10) + 750}) 
+        .style("fill", 'black')
+        .text(function(d){ return d})
+        .attr("text-anchor", "left")
+        .style("alignment-baseline", "middle")
+    // vis.legendScale = d3.scaleLinear()
+    // .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
 
     vis.xScale = d3.scaleLinear().range([0, vis.config.width]);
 
@@ -76,17 +108,55 @@ class Heatmap {
 
     vis.yAxisG = vis.chartArea.append("g").attr("class", "axis y-axis");
 
+    // Append axis titles
+    vis.chart
+      .append("text")
+      .attr("class", "axis-title")
+      .attr("y", 800)
+      .attr("x", 600)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Personality Score");
+
+    vis.chart
+      .append("text")
+      .attr("class", "axis-title")
+      .attr("x", -55)
+      .attr("y", -15)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Genre");
+
+    vis.chart
+      .append("text")
+      .attr("class", "axis-title")
+      .attr("y", 730)
+      .attr("x", 150)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text(`Low ${vis.trait}`);
+    
+    vis.chart
+      .append("text")
+      .attr("class", "axis-title")
+      .attr("y", 730)
+      .attr("x", 1000)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text(`High ${vis.trait}`);
+
     // Legend
+    
     // vis.legend = vis.svg
-    //   .append("g")
-    //   .attr(
-    //     "transform",
-    //     `translate(${
-    //       vis.config.containerWidth -
-    //       vis.config.legendWidth -
-    //       vis.config.margin.right
-    //     },0)`
-    //   );
+    //     .append("g")
+    //     .attr(
+    //       "transform",
+    //       `translate(${
+    //         vis.config.containerWidth -
+    //         vis.config.legendWidth -
+    //         vis.config.margin.right
+    //       },0)`
+    //     );
 
     // vis.legendColorGradient = vis.legend
     //   .append("defs")
@@ -99,7 +169,7 @@ class Heatmap {
     //   .attr("height", vis.config.legendBarHeight)
     //   .attr("fill", "url(#linear-gradient)");
 
-    // vis.xLegendScale = d3.scaleLinear().range([0, vis.config.legendWidth]);
+    // vis.xLegendScale = d3.scaleQuantize().range([0, vis.config.legendWidth]);
 
     // vis.xLegendAxis = d3
     //   .axisBottom(vis.xLegendScale)
@@ -118,34 +188,45 @@ class Heatmap {
    */
   updateVis() {
     const vis = this;
-
-    // Group data per state (we get a nested array)
-    // [['Alaska', [array with values]], ['Ala.', [array with values]], ...]
-    // vis.groupedData = d3.groups(vis.data, (d) => d.state);
-
-    // // Sort states by total case numbers (if the option is selected by the user)
-    // if (vis.config.sortOption == "cases") {
-    //   // Sum the case numbers for each state
-    //   // d[0] is the state name, d[1] contains an array of yearly values
-    //   vis.groupedData.forEach((d) => {
-    //     d[3] = d3.sum(d[1], (k) => k.value);
-    //   });
-
-    //   // Descending order
-    //   vis.groupedData.sort((a, b) => b[3] - a[3]);
-    // }
-
+  
     // Specificy accessor functions
-    vis.xValue = (d) => d.ipip_O;
+    vis.xValue = (d) => d[vis.trait];
     vis.yValue = (d) => d.name;
     vis.colorValue = (d) => d.pref;
 
     // Set the scale input domains
+
+    // let maxNum = 0;
+    // let minNum = 1000;
+    // console.log(vis.data);
+    // vis.data[0].values.forEach(function (object) {
+    //   if (Math.max(...Object.values(object).slice(1)) > maxNum) {
+    //     maxNum = Math.max(...Object.values(object).slice(1));
+    //   }
+    //   if (Math.min(...Object.values(object).slice(1)) < minNum) {
+    //     minNum = Math.min(...Object.values(object).slice(1));
+    //   }
+    // });
+    
+    // Find domain for xScale
+    let max = 0;
+    let min = 100;
+    vis.data.forEach(d => {
+      let d_max = d3.max(d.values, d => d[vis.trait]);
+      if (d_max > max) {
+         max = d_max;
+      }
+      let d_min = d3.min(d.values, d => d[vis.trait]);
+      if (d_min < min) {
+         min = d_min;
+      }
+    });
     vis.colorScale.domain([1, 5]);
-    vis.xScale.domain([7, 21]);
+    vis.xScale.domain([min, max+1]);
     vis.yScale.domain(movieGenres);
 
     vis.renderVis();
+    vis.renderLegend();
   }
   /**
    * Bind data to visual elements.
@@ -213,36 +294,44 @@ class Heatmap {
     // Update axis
     vis.xAxisG.call(vis.xAxis);
     vis.yAxisG.call(vis.yAxis);
+    
+    // vis.chart.select('.legendLinear')
+    // .call(vis.legendLinear);
   }
 
   /**
    * Update colour legend
    */
-  //   renderLegend() {
-  //     const vis = this;
+    renderLegend() {
+      const vis = this;
 
-  //     // Add stops to the gradient
-  //     vis.legendColorGradient
-  //       .selectAll("stop")
-  //       .data(vis.colorScale.range())
-  //       .join("stop")
-  //       .attr("offset", (d, i) => i / (vis.colorScale.range().length - 1))
-  //       .attr("stop-color", (d) => d);
+      // Add stops to the gradient
+      // vis.legendColorGradient
+      //   .selectAll("stop")
+      //   .data(vis.legendScale.range())
+      //   .join("stop")
+      //   .attr("offset", (d, i) => i / (vis.legendScale.range().length - 1))
+      //   .attr("stop-color", (d) => d);
 
-  //     // Set x-scale and reuse colour-scale because they share the same domain
-  //     // Round values using `nice()` to make them easier to read.
-  //     vis.xLegendScale.domain(vis.colorScale.domain()).nice();
-  //     const extent = vis.xLegendScale.domain();
+      // vis.legendColorGradient
+      //   .style("fill", function(d,i) {
+      //     return vis.legendScale(i);
+      //   })
 
-  //     // Manually calculate tick values
-  //     vis.xLegendAxis.tickValues([
-  //       extent[0],
-  //       parseInt(extent[1] / 3),
-  //       parseInt((extent[1] / 3) * 2),
-  //       extent[1],
-  //     ]);
+      // Set x-scale and reuse colour-scale because they share the same domain
+      // Round values using `nice()` to make them easier to read.
+      // vis.xLegendScale.domain(vis.legendScale.domain()).nice();
+      // const extent = vis.xLegendScale.domain();
 
-  //     // Update legend axis
-  //     vis.xLegendAxisG.call(vis.xLegendAxis);
-  //   }
+      // // Manually calculate tick values
+      // vis.xLegendAxis.tickValues([
+      //   extent[0],
+      // parseInt(extent[1] / 3),
+      // parseInt((extent[1] / 3) * 2),
+      // extent[1]
+      // ]);
+
+      // Update legend axis
+      //vis.xLegendAxisG.call(vis.xLegendAxis);
+    }
 }

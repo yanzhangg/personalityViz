@@ -51,15 +51,14 @@ const bookGenres = [
   "Medical_27",
 ];
 
-const traits = [
-  "O",
-]
+let data, heatmap, oCircularBarplot, cCircularBarplot, eCircularBarplot, aCircularBarplot, nCircularBarplot;
 
 /**
  * Load data from CSV file asynchronously and render charts
  */
 d3.csv("data/data.csv")
-  .then((data) => {
+  .then((_data) => {
+    data = _data;
     // Convert columns to numerical values
     data.forEach((d) => {
       Object.keys(d).forEach((attr) => {
@@ -110,43 +109,110 @@ d3.csv("data/data.csv")
         }),
       };
     });
-
-   // Group data by highest scoring trait
-   const dataByHighestScoringTrait = d3.group(data, d => d.Highest_Scoring_Trait);
-
-   // Get sum
-   let sums = [];
-   let sumObj = {};
-   let totalSums = [];
-   movieGenres.forEach(genre => {
-       let sum = d3.rollup(dataByHighestScoringTrait.get("O"), v => d3.sum(v, d => d[genre]));
-       totalSums.push(sum);
-
-       sumObj = {
-           name: genre,
-           sum
-       };
-       sums.push(sumObj);
-   });
-   console.log(totalSums);
+    
+    // Group data by highest scoring trait
+    const dataByHighestScoringTrait = d3.group(data, d => d.Highest_Scoring_Trait);
 
     // Initialize heatmap
-    const heatmap = new Heatmap(
+    heatmap = new Heatmap(
       {
         parentElement: "#heatmap",
       },
-      movieGenresData
+      movieGenresData,
+      "ipip_O"
     );
 
-    // Initialize circular barplot
-    const circularbarplot = new CircularBarplot(
+    // Initialize circular barplots
+    oCircularBarplot = new CircularBarplot(
       {
-        parentElement: "#circularbarplot",
+        parentElement: "#o-circularbarplot",
       },
-      sums
+      getHighestScoringTrait("O", dataByHighestScoringTrait),
+      "Openness"
+    );
+
+    cCircularBarplot = new CircularBarplot(
+      {
+        parentElement: "#c-circularbarplot",
+      },
+      getHighestScoringTrait("C", dataByHighestScoringTrait),
+      "Conscientiousness"
+    );
+
+    eCircularBarplot = new CircularBarplot(
+      {
+        parentElement: "#e-circularbarplot",
+      },
+      getHighestScoringTrait("E", dataByHighestScoringTrait),
+      "Extraversion"
+    );
+
+    aCircularBarplot = new CircularBarplot(
+      {
+        parentElement: "#a-circularbarplot",
+      },
+      getHighestScoringTrait("A", dataByHighestScoringTrait),
+      "Agreeableness"
+    );
+
+    nCircularBarplot = new CircularBarplot(
+      {
+        parentElement: "#n-circularbarplot",
+      },
+      getHighestScoringTrait("N", dataByHighestScoringTrait),
+      "Neuroticism"
     );
 
     heatmap.updateVis();
-    circularbarplot.updateVis();
+    oCircularBarplot.updateVis();
+    cCircularBarplot.updateVis();
+    eCircularBarplot.updateVis();
+    aCircularBarplot.updateVis();
+    nCircularBarplot.updateVis();
   })
   .catch((error) => console.error(error));
+
+  // Filter by selection
+d3.select("#trait-selector").on("change", function () {
+  const selected = d3.select(this).property("value");
+  console.log(selected);
+  switch (selected) {
+    case "ipip_O":
+      heatmap.trait = "ipip_O";
+      break;
+    case "ipip_C":
+      heatmap.trait = "ipip_C";
+      break;
+    case "ipip_E":
+      heatmap.trait = "ipip_E";
+      break;
+    case "ipip_A":
+      heatmap.trait = "ipip_A";
+      break;
+    case "ipip_N":
+      heatmap.trait = "ipip_N";
+      break;
+    default:
+      heatmap.trait = "ipip_O";
+      break;
+  }
+  heatmap.updateVis();
+});
+
+  function getHighestScoringTrait(trait, groupedData) {
+    // Get sum
+    let sums = [];
+    let sumObj = {};
+    let totalSums = [];
+    movieGenres.forEach(genre => {
+        let sum = d3.rollup(groupedData.get(trait), v => d3.sum(v, d => d[genre]));
+        totalSums.push(sum);
+
+        sumObj = {
+            name: genre,
+            sum
+        };
+        sums.push(sumObj);
+    });
+    return sums;
+  }
