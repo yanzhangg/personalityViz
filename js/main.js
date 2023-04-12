@@ -251,3 +251,19 @@ d3.select("#slider").on("change", function () {
     });
     return sums;
   }
+
+  function filterGenderData() {
+    const gender = d3.select('input[name="gender"]:checked').property("value");
+    let tempData;
+    
+    // if (gender == "male") {
+    //   tempData = globaldata.filter(d => d[gender] == 1);
+    // } else if (gender == "female") {
+    //   tempData = globaldata.filter(d => d[gender] == 2);
+    // }
+    console.log(tempData)
+   
+  }
+  
+  // Event listener to the radio button
+  d3.select("#gender-Button").on("change", filterGenderData )
