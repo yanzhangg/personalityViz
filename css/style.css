@@ -1,3 +1,7 @@
+.filters {
+    display: flex;
+}
+
 .container {
     display: flex;
 }

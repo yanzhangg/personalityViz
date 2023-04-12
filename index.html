@@ -10,14 +10,30 @@
     <!-- Add HTML content, SVG drawing area, ... -->
     <h1 style="padding-left: 20px">The Big Five Personality Traits & Media Preferences</h1>
 
-    <div style="padding-left: 20px">Filter by Personality Trait: 
-    <select id="trait-selector">
-        <option value="ipip_O">Openness</option>
-        <option value="ipip_C">Conscientiousness</option>
-        <option value="ipip_E">Extraversion</option>
-        <option value="ipip_A">Agreeableness</option>
-        <option value="ipip_N">Neuroticism</option>
-    </select>
+    <div class="filters">
+        <div style="padding-left: 20px">Filter by Personality Trait:
+            <select id="trait-selector">
+                <option value="ipip_O">Openness</option>
+                <option value="ipip_C">Conscientiousness</option>
+                <option value="ipip_E">Extraversion</option>
+                <option value="ipip_A">Agreeableness</option>
+                <option value="ipip_N">Neuroticism</option>
+            </select>
+        </div>
+
+        <!-- Radio button: one item selected only -->
+        <br>
+        <div style="padding-left: 20px">
+            <b>Gender:</b>
+            <br>
+            <input type="radio" name="gender" value="male"> Male<br>
+            <input type="radio" name="gender" value="female"> Female<br>
+            <input type="radio" name="gender" value="other"> Both<br>
+        </div>
+
+        <div style="padding-left: 20px">
+            <b>Age:</b>
+        </div>
     </div>
 
     <div class="container">
