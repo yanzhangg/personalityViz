@@ -51,7 +51,8 @@ const bookGenres = [
   "Medical_27",
 ];
 
-let data, heatmap, oCircularBarplot, cCircularBarplot, eCircularBarplot, aCircularBarplot, nCircularBarplot;
+let data, movieGenresData, bookGenresData, computeAggregatedData;
+let heatmap, oCircularBarplot, cCircularBarplot, eCircularBarplot, aCircularBarplot, nCircularBarplot;
 
 /**
  * Load data from CSV file asynchronously and render charts
@@ -75,41 +76,30 @@ d3.csv("data/data.csv")
       });
     });
 
-    const movieGenresData = movieGenres.map((group) => {
-      return {
-        name: group,
-        values: data.map((d) => {
-          return {
-            name: group,
-            ipip_O: d.IPIP_O,
-            ipip_C: d.IPIP_C,
-            ipip_E: d.IPIP_E,
-            ipip_A: d.IPIP_A,
-            ipip_N: d.IPIP_N,
-            pref: +d[group],
-          };
-        }),
-      };
-    });
+    computeAggregatedData = (mediaType) => {
+      return mediaType.map((group) => {
+        return {
+          name: group,
+          values: data.map((d) => {
+            let obj = {
+              name: group,
+              ipip_O: d.IPIP_O,
+              ipip_C: d.IPIP_C,
+              ipip_E: d.IPIP_E,
+              ipip_A: d.IPIP_A,
+              ipip_N: d.IPIP_N,
+              maxTrait: d.Highest_Scoring_Trait,
+              pref: +d[group],
+            };
+            return obj;
+          })
+        };
+      });
+    }
 
-    const bookGenresData = bookGenres.map((group) => {
-      return {
-        name: group,
-        values: data.map((d) => {
-          return {
-            name: group,
-            ipip_O: d.IPIP_O,
-            ipip_C: d.IPIP_C,
-            ipip_E: d.IPIP_E,
-            ipip_A: d.IPIP_A,
-            ipip_N: d.IPIP_N,
-            maxTrait: d.Highest_Scoring_Trait,
-            pref: +d[group],
-          };
-        }),
-      };
-    });
-    
+    movieGenresData = computeAggregatedData(movieGenres);
+    bookGenresData = computeAggregatedData(bookGenres);
+
     // Group data by highest scoring trait
     const dataByHighestScoringTrait = d3.group(data, d => d.Highest_Scoring_Trait);
 
@@ -119,7 +109,8 @@ d3.csv("data/data.csv")
         parentElement: "#heatmap",
       },
       movieGenresData,
-      "ipip_O"
+      "ipip_O",
+      "movies"
     );
 
     // Initialize circular barplots
@@ -199,8 +190,52 @@ d3.select("#trait-selector").on("change", function () {
   heatmap.updateVis();
 });
 
+// Filter by Media Type
+d3.select("#media-button").on("change", function() {
+  const selected = d3.select('input[name="media"]:checked').node().value;
+  if (selected == "movies") {
+    heatmap.data = movieGenresData;
+      heatmap.media = "movies";
+  } else if (selected == "books") {
+    heatmap.data = bookGenresData;
+      heatmap.media = "books";
+  }
+  heatmap.updateVis();
+});
+
+
+// Filter by Age
+d3.select("#slider").on("change", function () {
+  const age = d3.select(this).property("value");
+
+  console.log(movieGenresData)
+
+  // data.forEach((person))
+
+  d3.select('#age-value').text(this.value);
+});
+
+// Filter by Gender
+// d3.select("#gender-Button").on("change", function() {
+//   const selected = d3.select(this).property("value");
+//   console.log(selected);
+//   switch (selected) {
+//     case "male":
+//       heatmap.data.forEach(genre => {
+//         genre.values.filter(d => d.gender == 0);
+//       });
+//     case "female":
+//       heatmap.data.forEach(genre => {
+//           genre.values.filter(d => d.gender == 1);
+//       });
+//     case "both":
+//       heatmap.data.forEach(genre => {
+//         genre.values.filter(d => d.gender == 0);
+//       });
+//   }
+// })
+  
   function getHighestScoringTrait(trait, groupedData) {
-    // Get sum
     let sums = [];
     let sumObj = {};
     let totalSums = [];

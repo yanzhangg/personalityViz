@@ -4,7 +4,7 @@ class Heatmap {
    * @param {Object}
    * @param {Array}
    */
-  constructor(_config, _data, _trait) {
+  constructor(_config, _data, _trait, _media) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 1200,
@@ -16,6 +16,7 @@ class Heatmap {
     };
     this.data = _data;
     this.trait = _trait;
+    this.media = _media;
     this.initVis();
   }
 
@@ -35,7 +36,6 @@ class Heatmap {
     // Define size of SVG drawing area
     vis.svg = d3
       .select(vis.config.parentElement)
-      //   .append("svg")
       .attr("width", vis.config.containerWidth)
       .attr("height", vis.config.containerHeight);
 
@@ -69,7 +69,7 @@ class Heatmap {
       .enter()
       .append("rect")
         .attr("x", 10)
-        .attr("y", function(d,i) { return 100 + i*(25) + 750})
+        .attr("y", function(d,i) { return 100 + i*(25) + 700})
         .attr("width", 20)
         .attr("height", 20)
         .style("fill", function(d){ return vis.legendScale(d)})
@@ -78,12 +78,21 @@ class Heatmap {
         .data(keys)
         .enter()
         .append("text")
-        .attr("x", 100 + 20*1.2)
-        .attr("y", function(d,i){ return 100 + i*(25) + (10) + 750}) 
+        .attr("x", 30 + 20*1.3)
+        .attr("y", function(d,i){ return 100 + i*(25) + (10) + 700}) 
         .style("fill", 'black')
         .text(function(d){ return d})
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
+    
+    vis.chart
+      .append("text")
+      .attr("class", "legend-title")
+      .attr("y", function(d,i) { return 100 + i*(25) + 670})
+      .attr("x", 120)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Media Preference");
     // vis.legendScale = d3.scaleLinear()
     // .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
 
@@ -112,7 +121,7 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 800)
+      .attr("y", 750)
       .attr("x", 600)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
@@ -134,7 +143,7 @@ class Heatmap {
       .attr("x", 150)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text(`Low ${vis.trait}`);
+      .text(`Extremely Low`);
     
     vis.chart
       .append("text")
@@ -143,7 +152,7 @@ class Heatmap {
       .attr("x", 1000)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text(`High ${vis.trait}`);
+      .text(`Extremely High`);
 
     // Legend
     
@@ -193,20 +202,6 @@ class Heatmap {
     vis.xValue = (d) => d[vis.trait];
     vis.yValue = (d) => d.name;
     vis.colorValue = (d) => d.pref;
-
-    // Set the scale input domains
-
-    // let maxNum = 0;
-    // let minNum = 1000;
-    // console.log(vis.data);
-    // vis.data[0].values.forEach(function (object) {
-    //   if (Math.max(...Object.values(object).slice(1)) > maxNum) {
-    //     maxNum = Math.max(...Object.values(object).slice(1));
-    //   }
-    //   if (Math.min(...Object.values(object).slice(1)) < minNum) {
-    //     minNum = Math.min(...Object.values(object).slice(1));
-    //   }
-    // });
     
     // Find domain for xScale
     let max = 0;
@@ -221,9 +216,11 @@ class Heatmap {
          min = d_min;
       }
     });
+
+    // Set the scales for input domain
     vis.colorScale.domain([1, 5]);
     vis.xScale.domain([min, max+1]);
-    vis.yScale.domain(movieGenres);
+    vis.yScale.domain((vis.media == "movies") ? movieGenres : bookGenres);
 
     vis.renderVis();
     vis.renderLegend();
@@ -246,8 +243,8 @@ class Heatmap {
     // Enter + update
     rowEnter
       .merge(row)
-      .transition()
-      .duration(1000)
+      // .transition()
+      // .duration(1000)
       .attr("transform", (d) => `translate(0,${vis.yScale(vis.yValue(d))})`);
 
     // Exit

@@ -1,3 +1,7 @@
+h1 {
+    text-align: center;
+    padding-bottom: 50; 
+}
 .filters {
     display: flex;
 }
@@ -13,7 +17,11 @@
 
 .axis-title {
     font-weight: 700;
-  }
+}
+
+.legend-title {
+    font-weight: 700;
+}
 
 /* Tooltip */
 #tooltip {

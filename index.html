@@ -23,6 +23,12 @@
 
         <!-- Radio button: one item selected only -->
         <br>
+        <div id="media-button" style="padding-left: 20px">
+            <b>Media Type:</b>
+            <br>
+            <input type="radio" name="media" value="movies"> Movies<br>
+            <input type="radio" name="media" value="books"> Books<br>
+        </div>
         <div id="gender-Button" style="padding-left: 20px">
             <b>Gender:</b>
             <br>
@@ -30,9 +36,9 @@
             <input type="radio" name="gender" value="female"> Female<br>
             <input type="radio" name="gender" value="both" checked> Both<br>
         </div>
-
-        <div style="padding-left: 20px">
-            <b>Age:</b>
+        <div>
+            <label for="slider"><b>Age:</b> <span id="age-value">35</span></label>
+            <input type="range" min="18" value="35" max="35" id="slider">
         </div>
     </div>
 
