@@ -244,7 +244,26 @@ d3.select("#slider").on("change", function () {
 });
 
 function changeTraitView(trait) {
-  //d3.select("#trait-selector").property("value", trait);
+  switch (trait) {
+    case "Openness":
+      heatmap.trait = "ipip_O";
+      break;
+    case "Conscientiousness":
+      heatmap.trait = "ipip_C";
+      break;
+    case "Extraversion":
+      heatmap.trait = "ipip_E";
+      break;
+    case "Agreeableness":
+      heatmap.trait = "ipip_A";
+      break;
+    case "Neuroticism":
+      heatmap.trait = "ipip_N";
+      break;
+    default:
+      heatmap.trait = "ipip_O";
+      break;
+  }
 
   oCircularBarplot.highlightedTrait = trait;
   cCircularBarplot.highlightedTrait = trait;
