@@ -52,7 +52,12 @@ const bookGenres = [
 ];
 
 let data, movieGenresData, bookGenresData, computeAggregatedData;
-let heatmap, oCircularBarplot, cCircularBarplot, eCircularBarplot, aCircularBarplot, nCircularBarplot;
+let heatmap,
+  oCircularBarplot,
+  cCircularBarplot,
+  eCircularBarplot,
+  aCircularBarplot,
+  nCircularBarplot;
 
 /**
  * Load data from CSV file asynchronously and render charts
@@ -76,11 +81,11 @@ d3.csv("data/data.csv")
       });
     });
 
-    computeAggregatedData = (mediaType) => {
+    computeAggregatedData = (mediaType, dataset) => {
       return mediaType.map((group) => {
         return {
           name: group,
-          values: data.map((d) => {
+          values: dataset.map((d) => {
             let obj = {
               name: group,
               ipip_O: d.IPIP_O,
@@ -92,16 +97,19 @@ d3.csv("data/data.csv")
               pref: +d[group],
             };
             return obj;
-          })
+          }),
         };
       });
-    }
+    };
 
-    movieGenresData = computeAggregatedData(movieGenres);
-    bookGenresData = computeAggregatedData(bookGenres);
+    movieGenresData = computeAggregatedData(movieGenres, data);
+    bookGenresData = computeAggregatedData(bookGenres, data);
 
     // Group data by highest scoring trait
-    const dataByHighestScoringTrait = d3.group(data, d => d.Highest_Scoring_Trait);
+    const dataByHighestScoringTrait = d3.group(
+      data,
+      (d) => d.Highest_Scoring_Trait
+    );
 
     // Initialize heatmap
     heatmap = new Heatmap(
@@ -163,7 +171,7 @@ d3.csv("data/data.csv")
   })
   .catch((error) => console.error(error));
 
-  // Filter by selection
+// Filter by selection
 d3.select("#trait-selector").on("change", function () {
   const selected = d3.select(this).property("value");
   console.log(selected);
@@ -191,28 +199,37 @@ d3.select("#trait-selector").on("change", function () {
 });
 
 // Filter by Media Type
-d3.select("#media-button").on("change", function() {
+d3.select("#media-button").on("change", function () {
   const selected = d3.select('input[name="media"]:checked').node().value;
   if (selected == "movies") {
     heatmap.data = movieGenresData;
-      heatmap.media = "movies";
+    heatmap.media = "movies";
   } else if (selected == "books") {
     heatmap.data = bookGenresData;
-      heatmap.media = "books";
+    heatmap.media = "books";
   }
   heatmap.updateVis();
 });
-
 
 // Filter by Age
 d3.select("#slider").on("change", function () {
   const age = d3.select(this).property("value");
 
-  console.log(movieGenresData)
+  d3.select("#age-value").text(this.value);
 
-  // data.forEach((person))
+  const filteredAgeData = data.filter((person) => person["Age"] <= age);
+  movieGenresData = computeAggregatedData(movieGenres, filteredAgeData);
+  bookGenresData = computeAggregatedData(bookGenres, filteredAgeData);
 
-  d3.select('#age-value').text(this.value);
+  const genreSelected = d3.select('input[name="media"]:checked').node().value;
+  if (genreSelected == "movies") {
+    heatmap.data = movieGenresData;
+    heatmap.media = "movies";
+  } else if (genreSelected == "books") {
+    heatmap.data = bookGenresData;
+    heatmap.media = "books";
+  }
+  heatmap.updateVis();
 });
 
 // Filter by Gender
@@ -234,36 +251,37 @@ d3.select("#slider").on("change", function () {
 //       });
 //   }
 // })
-  
-  function getHighestScoringTrait(trait, groupedData) {
-    let sums = [];
-    let sumObj = {};
-    let totalSums = [];
-    movieGenres.forEach(genre => {
-        let sum = d3.rollup(groupedData.get(trait), v => d3.sum(v, d => d[genre]));
-        totalSums.push(sum);
 
-        sumObj = {
-            name: genre,
-            sum
-        };
-        sums.push(sumObj);
-    });
-    return sums;
-  }
+function getHighestScoringTrait(trait, groupedData) {
+  let sums = [];
+  let sumObj = {};
+  let totalSums = [];
+  movieGenres.forEach((genre) => {
+    let sum = d3.rollup(groupedData.get(trait), (v) =>
+      d3.sum(v, (d) => d[genre])
+    );
+    totalSums.push(sum);
 
-  function filterGenderData() {
-    const gender = d3.select('input[name="gender"]:checked').property("value");
-    let tempData;
-    
-    // if (gender == "male") {
-    //   tempData = globaldata.filter(d => d[gender] == 1);
-    // } else if (gender == "female") {
-    //   tempData = globaldata.filter(d => d[gender] == 2);
-    // }
-    console.log(tempData)
-   
-  }
-  
-  // Event listener to the radio button
-  d3.select("#gender-Button").on("change", filterGenderData )
+    sumObj = {
+      name: genre,
+      sum,
+    };
+    sums.push(sumObj);
+  });
+  return sums;
+}
+
+function filterGenderData() {
+  const gender = d3.select('input[name="gender"]:checked').property("value");
+  let tempData;
+
+  // if (gender == "male") {
+  //   tempData = globaldata.filter(d => d[gender] == 1);
+  // } else if (gender == "female") {
+  //   tempData = globaldata.filter(d => d[gender] == 2);
+  // }
+  console.log(tempData);
+}
+
+// Event listener to the radio button
+d3.select("#gender-Button").on("change", filterGenderData);
