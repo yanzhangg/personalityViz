@@ -1,6 +1,14 @@
+body {
+    font-family: sans-serif;
+}
 h1 {
     text-align: center;
-    padding-bottom: 50; 
+    padding-bottom: 50px; 
+}
+h4 {
+    font-weight: 200;
+    font-style: italic;
+    padding-left: 35px;
 }
 .filters {
     display: flex;
@@ -44,4 +52,17 @@ h1 {
 color: #000;
 font-size: 13px;
 font-weight: 300;
+}
+
+/* Annotations */
+.personality-line {
+    stroke: #333;
+    shape-rendering: crispedges;
+    stroke-width: 3px;
+}
+
+.personality-label {
+fill: #333;
+font-size: 15px;
+font-weight: 700;
 }

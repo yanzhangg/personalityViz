@@ -58,7 +58,8 @@ let heatmap,
   eCircularBarplot,
   aCircularBarplot,
   nCircularBarplot,
-  highlightedTrait;
+  highlightedTrait,
+  globaldata;
 
 /**
  * Load data from CSV file asynchronously and render charts
@@ -82,6 +83,7 @@ d3.csv("data/data.csv")
       });
     });
 
+    // Group data by media type and genre
     computeAggregatedData = (mediaType, dataset) => {
       return mediaType.map((group) => {
         return {
@@ -96,6 +98,8 @@ d3.csv("data/data.csv")
               ipip_N: d.IPIP_N,
               maxTrait: d.Highest_Scoring_Trait,
               pref: +d[group],
+              age: d.Age,
+              gender: d.Gender,
             };
             return obj;
           }),
@@ -130,7 +134,8 @@ d3.csv("data/data.csv")
         parentElement: "#o-circularbarplot",
       },
       getHighestScoringTrait("O", dataByHighestScoringTrait),
-      "Openness", highlightedTrait
+      "Openness",
+      highlightedTrait
     );
 
     cCircularBarplot = new CircularBarplot(
@@ -138,7 +143,8 @@ d3.csv("data/data.csv")
         parentElement: "#c-circularbarplot",
       },
       getHighestScoringTrait("C", dataByHighestScoringTrait),
-      "Conscientiousness", highlightedTrait
+      "Conscientiousness",
+      highlightedTrait
     );
 
     eCircularBarplot = new CircularBarplot(
@@ -146,7 +152,8 @@ d3.csv("data/data.csv")
         parentElement: "#e-circularbarplot",
       },
       getHighestScoringTrait("E", dataByHighestScoringTrait),
-      "Extraversion", highlightedTrait
+      "Extraversion",
+      highlightedTrait
     );
 
     aCircularBarplot = new CircularBarplot(
@@ -154,7 +161,8 @@ d3.csv("data/data.csv")
         parentElement: "#a-circularbarplot",
       },
       getHighestScoringTrait("A", dataByHighestScoringTrait),
-      "Agreeableness", highlightedTrait
+      "Agreeableness",
+      highlightedTrait
     );
 
     nCircularBarplot = new CircularBarplot(
@@ -162,7 +170,8 @@ d3.csv("data/data.csv")
         parentElement: "#n-circularbarplot",
       },
       getHighestScoringTrait("N", dataByHighestScoringTrait),
-      "Neuroticism", highlightedTrait
+      "Neuroticism",
+      highlightedTrait
     );
 
     heatmap.updateVis();
@@ -174,10 +183,10 @@ d3.csv("data/data.csv")
   })
   .catch((error) => console.error(error));
 
-// Filter by selection
+// Filter by selection on personality trait and trigger change to circular barplots
 d3.select("#trait-selector").on("change", function () {
   const selected = d3.select(this).property("value");
-  
+
   switch (selected) {
     case "ipip_O":
       heatmap.trait = "ipip_O";
@@ -206,43 +215,66 @@ d3.select("#trait-selector").on("change", function () {
   }
 });
 
-
 // Filter by Media Type
-  d3.select("#media-button").on("change", function() {
-    const selected = d3.select('input[name="media"]:checked').node().value;
-    let filteredData;
-    if (selected == "movies") {
-      filteredData = movieGenresData;
-        heatmap.media = "movies";
-    } else if (selected == "books") {
-      filteredData = bookGenresData;
-        heatmap.media = "books";
-    }
-    heatmap.data = filteredData;
-    heatmap.updateVis();
-  });
+d3.select("#media-button").on("change", filterAll);
 
 // Filter by Age
-d3.select("#slider").on("change", function () {
-  const age = d3.select(this).property("value");
+d3.select("#slider").on("change", filterAll);
 
-  d3.select("#age-value").text(this.value);
+// Filter by Gender
+d3.select("#gender-Button").on("change", filterAll);
 
-  const filteredAgeData = data.filter((person) => person["Age"] <= age);
-  movieGenresData = computeAggregatedData(movieGenres, filteredAgeData);
-  bookGenresData = computeAggregatedData(bookGenres, filteredAgeData);
+// Filter data by all selections (media type, age, gender)
+function filterAll() {
+  let filteredData = [];
 
-  const genreSelected = d3.select('input[name="media"]:checked').node().value;
-  if (genreSelected == "movies") {
-    heatmap.data = movieGenresData;
+  // Filter by Media
+  const selected = d3.select('input[name="media"]:checked').node().value;
+  if (selected == "movies") {
+    filteredData = computeAggregatedData(movieGenres, data);
+    console.log("movieData", movieGenresData);
     heatmap.media = "movies";
-  } else if (genreSelected == "books") {
-    heatmap.data = bookGenresData;
+  } else if (selected == "books") {
+    filteredData = computeAggregatedData(bookGenres, data);
     heatmap.media = "books";
   }
-  heatmap.updateVis();
-});
 
+  // Filter by Age
+  const age = d3.select("#slider").property("value");
+
+  d3.select("#age-value").text(age);
+  filteredData.forEach((genre) => {
+    genre.values = genre.values.filter((item) => item.age <= age);
+  });
+
+  // Filter by Gender
+  const gender = d3
+    .select("#gender-Button")
+    .select('input[name="gender"]:checked')
+    .node().value;
+  switch (gender) {
+    case "male":
+      filteredData.forEach((genre) => {
+        genre.values = genre.values.filter((item) => item.gender == 0);
+      });
+      break;
+    case "female":
+      filteredData.forEach((genre) => {
+        genre.values = genre.values.filter((item) => item.gender == 1);
+      });
+      break;
+    case "both":
+      break;
+    default:
+      break;
+  }
+
+  heatmap.data = filteredData;
+  heatmap.updateVis();
+}
+
+// Change heatmap and dropdown to given trait, 
+// and update highlighting of circular barplots
 function changeTraitView(trait) {
   switch (trait) {
     case "Openness":
@@ -285,37 +317,9 @@ function changeTraitView(trait) {
   nCircularBarplot.updateVis();
 }
 
-//Filter by Gender
-d3.select("#gender-Button").on("change", filterGenderOnChange);
-
-function filterGender() {
-    const selected = d3.select("#gender-Button").select('input[name="gender"]:checked').node().value;
-    let filteredData;
-    let mediaArr = (heatmap.media == "movies") ? movieGenres : bookGenres;
-    switch (selected) {
-      case "male":
-        filteredData = computeAggregatedData(mediaArr, data.filter((item) => item.Gender == 0));
-        console.log(filteredData);
-        break;
-      case "female":
-        filteredData = computeAggregatedData(mediaArr, data.filter((item) => item.Gender == 1));
-        console.log(data.filter((item) => item.Gender == 1));
-        break;
-      case "both":
-        filteredData = computeAggregatedData(mediaArr, data);
-        break;
-      default:
-        filteredData = computeAggregatedData(mediaArr, data);
-        break;
-    }
-    heatmap.data = filteredData;
-}
-
-function filterGenderOnChange() {
-  filterGender();
-  heatmap.updateVis();
-}
-
+// Get sums of preference scores for each genre by highest-scoring personality trait
+// - groupedData: data grouped by highest scoring trait
+// - trait: Big Five personality trait
 function getHighestScoringTrait(trait, groupedData) {
   let sums = [];
   let sumObj = {};
@@ -334,32 +338,3 @@ function getHighestScoringTrait(trait, groupedData) {
   });
   return sums;
 }
-
-// function filterGenderData() {
-//   const gender = d3.select('input[name="gender"]:checked').property("value");
-//   let tempData;
-
-//   if (gender == "male") {
-//     tempData = data.filter(d => d["Gender"] == 0);
-//   } else if (gender == "female") {
-//     tempData = data.filter(d => d["Gender"] == 1);
-//   } else {
-//     tempData = data;
-//   }
-  
-//   movieGenresData = computeAggregatedData(movieGenres, tempData);
-//   bookGenresData = computeAggregatedData(bookGenres, tempData);
-
-//   const genreSelected = d3.select('input[name="media"]:checked').node().value;
-//   if (genreSelected == "movies") {
-//     heatmap.data = movieGenresData;
-//     heatmap.media = "movies";
-//   } else if (genreSelected == "books") {
-//     heatmap.data = bookGenresData;
-//     heatmap.media = "books";
-//   }
-//   heatmap.updateVis();
-// }
-
-// Event listener to the radio button
-// d3.select("#gender-Button").on("change", filterGenderData);

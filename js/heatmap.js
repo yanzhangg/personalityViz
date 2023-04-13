@@ -10,7 +10,7 @@ class Heatmap {
       containerWidth: _config.containerWidth || 1300,
       containerHeight: _config.containerHeight || 1000,
       tooltipPadding: 15,
-      margin: _config.margin || { top: 50, right: 200, bottom: 100, left: 150 },
+      margin: _config.margin || { top: 20, right: 200, bottom: 100, left: 150 },
       legendWidth: 160,
       legendBarHeight: 10,
     };
@@ -20,6 +20,9 @@ class Heatmap {
     this.initVis();
   }
 
+  /**
+   * Create scales, axes, and append static elements
+   */
   initVis() {
     const vis = this;
 
@@ -50,6 +53,7 @@ class Heatmap {
 
     vis.chart = vis.chartArea.append("g");
 
+    // Create legend
     var keys = [
       "Strongly Dislike",
       "Dislike",
@@ -57,14 +61,8 @@ class Heatmap {
       "Like",
       "Strongly Like",
     ];
+
     var legendcolor = ["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"];
-
-    // Initialize scales
-    // vis.colorScale = d3.scaleSequential().interpolator(d3.interpolateReds);
-    vis.colorScale = d3
-      .scaleOrdinal()
-      .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
-
     vis.legendScale = d3.scaleOrdinal().domain(keys).range(legendcolor);
 
     vis.chart
@@ -108,15 +106,18 @@ class Heatmap {
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Media Preference");
-    // vis.legendScale = d3.scaleLinear()
-    // .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
+
+    // Initialize scales
+    vis.colorScale = d3
+      .scaleOrdinal()
+      .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
 
     vis.xScale = d3.scaleLinear().range([0, vis.config.width]);
 
     vis.yScale = d3.scaleBand().range([0, vis.config.height]).paddingInner(0.2);
 
-    // Initialize x-axis
-    vis.xAxis = d3.axisBottom(vis.xScale).ticks(6).tickSize(0).tickPadding(10);
+    // Initialize axes
+    vis.xAxis = d3.axisBottom(vis.xScale).ticks(8).tickSize(0).tickPadding(10);
 
     vis.yAxis = d3
       .axisLeft(vis.yScale)
@@ -136,7 +137,7 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 900)
+      .attr("y", 930)
       .attr("x", 530)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
@@ -146,7 +147,7 @@ class Heatmap {
       .append("text")
       .attr("class", "axis-title")
       .attr("x", -55)
-      .attr("y", -15)
+      .attr("y", 5)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Genre");
@@ -154,7 +155,7 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 880)
+      .attr("y", 910)
       .attr("x", 120)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
@@ -163,11 +164,28 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 880)
+      .attr("y", 910)
       .attr("x", 930)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text(`Extremely High`);
+
+    // Add personality annotation
+    vis.personalityLine = vis.chartArea
+      .append("line")
+      .attr("class", "personality-line")
+      .attr("id", "highlight")
+      .attr("opacity", 0);
+
+    vis.personalityLabel = vis.chartArea
+      .append("text")
+      .attr("class", "personality-label")
+      .attr("id", "personality-label")
+      .attr("text-anchor", "middle")
+      .attr("y", -20)
+      .attr("dy", "0.85em")
+      .attr("opacity", 0)
+      .text("Your personality score");
 
     vis.updateVis();
   }
@@ -204,6 +222,7 @@ class Heatmap {
 
     vis.renderVis();
   }
+
   /**
    * Bind data to visual elements.
    */
@@ -228,12 +247,13 @@ class Heatmap {
     row.exit().remove();
 
     // 2. Level: columns
-
-    // 2a) Actual cells
+    // 2a) Cells
     const cell = row
       .merge(rowEnter)
       .selectAll(".h-cell")
       .data((d) => d.values);
+
+    cell.exit().remove();
 
     // Enter
     const cellEnter = cell.enter().append("rect").attr("class", "h-cell");
@@ -247,23 +267,44 @@ class Heatmap {
       .attr("fill", (d) => {
         return vis.colorScale(vis.colorValue(d));
       });
-    // .on("mouseover", (event, d) => {
-    //   const value =
-    //     d.value === null
-    //       ? "No data available"
-    //       : Math.round(d.value * 100) / 100;
-    //   d3
-    //     .select("#tooltip")
-    //     .style("display", "block")
-    //     .style("left", event.pageX + vis.config.tooltipPadding + "px")
-    //     .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
-    //         <div class='tooltip-title'>${d.state}</div>
-    //         <div>${d.year}: <strong>${value}</strong></div>
-    //       `);
-    // })
-    // .on("mouseleave", () => {
-    //   d3.select("#tooltip").style("display", "none");
-    // });
+
+    // Set the positions of the annotations
+    const personalityScore = vis.xScale.domain()[0];
+    vis.personalityLine
+      .attr("x1", (personalityScore + personalityScore + 1) / 2)
+      .attr("x2", (personalityScore + personalityScore + 1) / 2)
+      .attr("y1", 0)
+      .attr("y2", vis.config.height)
+      .attr("opacity", 0);
+
+    vis.personalityLabel
+      .attr("x", (personalityScore + personalityScore + 1) / 2)
+      .attr("opacity", 0);
+
+    // Highlight column when clicked
+    cellEnter.on("click", (event, d) => {
+      d3.select("#highlight")
+        .attr(
+          "x1",
+          (vis.xScale(vis.xValue(d)) + vis.xScale(vis.xValue(d) + 1)) / 2
+        )
+        .attr(
+          "x2",
+          (vis.xScale(vis.xValue(d)) + vis.xScale(vis.xValue(d) + 1)) / 2
+        )
+        .style("stroke-width", cellWidth)
+        .attr("opacity", 0.3)
+        .style("display", "block");
+
+      d3.select("#personality-label")
+        .attr(
+          "x",
+          (vis.xScale(vis.xValue(d)) + vis.xScale(vis.xValue(d) + 1)) / 2
+        )
+        .attr("opacity", 1)
+        .style("display", "block")
+        .text("Your personality score: " + vis.xValue(d));
+    });
 
     // Update axis
     vis.xAxisG.call(vis.xAxis);
