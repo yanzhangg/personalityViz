@@ -181,59 +181,29 @@ d3.select("#trait-selector").on("change", function () {
   switch (selected) {
     case "ipip_O":
       heatmap.trait = "ipip_O";
-      oCircularBarplot.highlightedTrait = "Openness";
-      cCircularBarplot.highlightedTrait = "Openness";
-      eCircularBarplot.highlightedTrait = "Openness";
-      aCircularBarplot.highlightedTrait = "Openness";
-      nCircularBarplot.highlightedTrait = "Openness";
+      changeTraitView("Openness");
       break;
     case "ipip_C":
       heatmap.trait = "ipip_C";
-      oCircularBarplot.highlightedTrait = "Conscientiousness";
-      cCircularBarplot.highlightedTrait = "Conscientiousness";
-      eCircularBarplot.highlightedTrait = "Conscientiousness";
-      aCircularBarplot.highlightedTrait = "Conscientiousness";
-      nCircularBarplot.highlightedTrait = "Conscientiousness";
+      changeTraitView("Conscientiousness");
       break;
     case "ipip_E":
       heatmap.trait = "ipip_E";
-      oCircularBarplot.highlightedTrait = "Extraversion";
-      cCircularBarplot.highlightedTrait = "Extraversion";
-      eCircularBarplot.highlightedTrait = "Extraversion";
-      aCircularBarplot.highlightedTrait = "Extraversion";
-      nCircularBarplot.highlightedTrait = "Extraversion";
+      changeTraitView("Extraversion");
       break;
     case "ipip_A":
       heatmap.trait = "ipip_A";
-      oCircularBarplot.highlightedTrait = "Agreeableness";
-      cCircularBarplot.highlightedTrait = "Agreeableness";
-      eCircularBarplot.highlightedTrait = "Agreeableness";
-      aCircularBarplot.highlightedTrait = "Agreeableness";
-      nCircularBarplot.highlightedTrait = "Agreeableness";
+      changeTraitView("Agreeableness");
       break;
     case "ipip_N":
       heatmap.trait = "ipip_N";
-      oCircularBarplot.highlightedTrait = "Neuroticism";
-      cCircularBarplot.highlightedTrait = "Neuroticism";
-      eCircularBarplot.highlightedTrait = "Neuroticism";
-      aCircularBarplot.highlightedTrait = "Neuroticism";
-      nCircularBarplot.highlightedTrait = "Neuroticism";
+      changeTraitView("Neuroticism");
       break;
     default:
       heatmap.trait = "ipip_O";
-      oCircularBarplot.highlightedTrait = "Openness";
-      cCircularBarplot.highlightedTrait = "Openness";
-      eCircularBarplot.highlightedTrait = "Openness";
-      aCircularBarplot.highlightedTrait = "Openness";
-      nCircularBarplot.highlightedTrait = "Openness";
+      changeTraitView("Openness");
       break;
   }
-  heatmap.updateVis();
-  oCircularBarplot.updateVis();
-  cCircularBarplot.updateVis();
-  eCircularBarplot.updateVis();
-  aCircularBarplot.updateVis();
-  nCircularBarplot.updateVis();
 });
 
 
@@ -272,6 +242,23 @@ d3.select("#slider").on("change", function () {
   }
   heatmap.updateVis();
 });
+
+function changeTraitView(trait) {
+  //d3.select("#trait-selector").property("value", trait);
+
+  oCircularBarplot.highlightedTrait = trait;
+  cCircularBarplot.highlightedTrait = trait;
+  eCircularBarplot.highlightedTrait = trait;
+  aCircularBarplot.highlightedTrait = trait;
+  nCircularBarplot.highlightedTrait = trait;
+
+  heatmap.updateVis();
+  oCircularBarplot.updateVis();
+  cCircularBarplot.updateVis();
+  eCircularBarplot.updateVis();
+  aCircularBarplot.updateVis();
+  nCircularBarplot.updateVis();
+}
 
 //Filter by Gender
 d3.select("#gender-Button").on("change", filterGenderOnChange);

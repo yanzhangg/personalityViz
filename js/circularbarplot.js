@@ -139,6 +139,9 @@ class CircularBarplot {
                     return 'none';
                 }
             })
+            .on("click", function (event, d) {
+                changeTraitView(vis.name);
+            });
 
 
         // Add genre labels
