@@ -247,21 +247,27 @@ function changeTraitView(trait) {
   switch (trait) {
     case "Openness":
       heatmap.trait = "ipip_O";
+      document.getElementById("trait-selector").value = "ipip_O";
       break;
     case "Conscientiousness":
       heatmap.trait = "ipip_C";
+      document.getElementById("trait-selector").value = "ipip_C";
       break;
     case "Extraversion":
       heatmap.trait = "ipip_E";
+      document.getElementById("trait-selector").value = "ipip_E";
       break;
     case "Agreeableness":
       heatmap.trait = "ipip_A";
+      document.getElementById("trait-selector").value = "ipip_A";
       break;
     case "Neuroticism":
       heatmap.trait = "ipip_N";
+      document.getElementById("trait-selector").value = "ipip_N";
       break;
     default:
       heatmap.trait = "ipip_O";
+      document.getElementById("trait-selector").value = "ipip_O";
       break;
   }
 
