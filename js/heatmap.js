@@ -50,7 +50,13 @@ class Heatmap {
 
     vis.chart = vis.chartArea.append("g");
 
-    var keys = ["Strongly Dislike", "Dislike", "Neutral", "Like", "Strongly Like"];
+    var keys = [
+      "Strongly Dislike",
+      "Dislike",
+      "Neutral",
+      "Like",
+      "Strongly Like",
+    ];
     var legendcolor = ["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"];
 
     // Initialize scales
@@ -59,36 +65,45 @@ class Heatmap {
       .scaleOrdinal()
       .range(["#D92616", "#FF8989", "#BFBFC7", "#95E0AD", "#23A147"]);
 
-    vis.legendScale = d3
-      .scaleOrdinal()
-      .domain(keys)
-      .range(legendcolor);
+    vis.legendScale = d3.scaleOrdinal().domain(keys).range(legendcolor);
 
-    vis.chart.selectAll("rects")
+    vis.chart
+      .selectAll("rects")
       .data(keys)
       .enter()
       .append("rect")
-        .attr("x", 1010)
-        .attr("y", function(d,i) { return 30 + i*(25)})
-        .attr("width", 20)
-        .attr("height", 20)
-        .style("fill", function(d){ return vis.legendScale(d)})
+      .attr("x", 1010)
+      .attr("y", function (d, i) {
+        return 30 + i * 25;
+      })
+      .attr("width", 20)
+      .attr("height", 20)
+      .style("fill", function (d) {
+        return vis.legendScale(d);
+      });
 
-    vis.chart.selectAll("label")
-        .data(keys)
-        .enter()
-        .append("text")
-        .attr("x", 1010 + 20*1.3)
-        .attr("y", function(d,i){ return 30 + i*(25) + (10)}) 
-        .style("fill", 'black')
-        .text(function(d){ return d})
-        .attr("text-anchor", "left")
-        .style("alignment-baseline", "middle")
-    
+    vis.chart
+      .selectAll("label")
+      .data(keys)
+      .enter()
+      .append("text")
+      .attr("x", 1010 + 20 * 1.3)
+      .attr("y", function (d, i) {
+        return 30 + i * 25 + 10;
+      })
+      .style("fill", "black")
+      .text(function (d) {
+        return d;
+      })
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle");
+
     vis.chart
       .append("text")
       .attr("class", "legend-title")
-      .attr("y", function(d,i) { return 5 + i*(25)})
+      .attr("y", function (d, i) {
+        return 5 + i * 25;
+      })
       .attr("x", 1130)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
@@ -144,7 +159,7 @@ class Heatmap {
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text(`Extremely Low`);
-    
+
     vis.chart
       .append("text")
       .attr("class", "axis-title")
@@ -162,30 +177,30 @@ class Heatmap {
    */
   updateVis() {
     const vis = this;
-  
+
     // Specificy accessor functions
     vis.xValue = (d) => d[vis.trait];
     vis.yValue = (d) => d.name;
     vis.colorValue = (d) => d.pref;
-    
+
     // Find domain for xScale
     let max = 0;
     let min = 100;
-    vis.data.forEach(d => {
-      let d_max = d3.max(d.values, d => d[vis.trait]);
+    vis.data.forEach((d) => {
+      let d_max = d3.max(d.values, (d) => d[vis.trait]);
       if (d_max > max) {
-         max = d_max;
+        max = d_max;
       }
-      let d_min = d3.min(d.values, d => d[vis.trait]);
+      let d_min = d3.min(d.values, (d) => d[vis.trait]);
       if (d_min < min) {
-         min = d_min;
+        min = d_min;
       }
     });
-   
+
     // Set the scales for input domain
     vis.colorScale.domain([1, 5]);
-    vis.xScale.domain([min, max+1]);
-    vis.yScale.domain((vis.media == "movies") ? movieGenres : bookGenres);
+    vis.xScale.domain([min, max + 1]);
+    vis.yScale.domain(vis.media == "movies" ? movieGenres : bookGenres);
 
     vis.renderVis();
   }
@@ -232,23 +247,23 @@ class Heatmap {
       .attr("fill", (d) => {
         return vis.colorScale(vis.colorValue(d));
       });
-    //   .on("mouseover", (event, d) => {
-    //     const value =
-    //       d.value === null
-    //         ? "No data available"
-    //         : Math.round(d.value * 100) / 100;
-    //     d3
-    //       .select("#tooltip")
-    //       .style("display", "block")
-    //       .style("left", event.pageX + vis.config.tooltipPadding + "px")
-    //       .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
-    //           <div class='tooltip-title'>${d.state}</div>
-    //           <div>${d.year}: <strong>${value}</strong></div>
-    //         `);
-    //   })
-    //   .on("mouseleave", () => {
-    //     d3.select("#tooltip").style("display", "none");
-    //   });
+    // .on("mouseover", (event, d) => {
+    //   const value =
+    //     d.value === null
+    //       ? "No data available"
+    //       : Math.round(d.value * 100) / 100;
+    //   d3
+    //     .select("#tooltip")
+    //     .style("display", "block")
+    //     .style("left", event.pageX + vis.config.tooltipPadding + "px")
+    //     .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+    //         <div class='tooltip-title'>${d.state}</div>
+    //         <div>${d.year}: <strong>${value}</strong></div>
+    //       `);
+    // })
+    // .on("mouseleave", () => {
+    //   d3.select("#tooltip").style("display", "none");
+    // });
 
     // Update axis
     vis.xAxisG.call(vis.xAxis);
