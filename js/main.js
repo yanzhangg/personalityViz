@@ -289,12 +289,26 @@ function getHighestScoringTrait(trait, groupedData) {
 //   const gender = d3.select('input[name="gender"]:checked').property("value");
 //   let tempData;
 
-//   // if (gender == "male") {
-//   //   tempData = globaldata.filter(d => d[gender] == 1);
-//   // } else if (gender == "female") {
-//   //   tempData = globaldata.filter(d => d[gender] == 2);
-//   // }
-//   console.log(tempData);
+//   if (gender == "male") {
+//     tempData = data.filter(d => d["Gender"] == 0);
+//   } else if (gender == "female") {
+//     tempData = data.filter(d => d["Gender"] == 1);
+//   } else {
+//     tempData = data;
+//   }
+  
+//   movieGenresData = computeAggregatedData(movieGenres, tempData);
+//   bookGenresData = computeAggregatedData(bookGenres, tempData);
+
+//   const genreSelected = d3.select('input[name="media"]:checked').node().value;
+//   if (genreSelected == "movies") {
+//     heatmap.data = movieGenresData;
+//     heatmap.media = "movies";
+//   } else if (genreSelected == "books") {
+//     heatmap.data = bookGenresData;
+//     heatmap.media = "books";
+//   }
+//   heatmap.updateVis();
 // }
 
 // Event listener to the radio button
