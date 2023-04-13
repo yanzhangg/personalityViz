@@ -198,18 +198,21 @@ d3.select("#trait-selector").on("change", function () {
   heatmap.updateVis();
 });
 
+
 // Filter by Media Type
-d3.select("#media-button").on("change", function () {
-  const selected = d3.select('input[name="media"]:checked').node().value;
-  if (selected == "movies") {
-    heatmap.data = movieGenresData;
-    heatmap.media = "movies";
-  } else if (selected == "books") {
-    heatmap.data = bookGenresData;
-    heatmap.media = "books";
-  }
-  heatmap.updateVis();
-});
+  d3.select("#media-button").on("change", function() {
+    const selected = d3.select('input[name="media"]:checked').node().value;
+    let filteredData;
+    if (selected == "movies") {
+      filteredData = movieGenresData;
+        heatmap.media = "movies";
+    } else if (selected == "books") {
+      filteredData = bookGenresData;
+        heatmap.media = "books";
+    }
+    heatmap.data = filteredData;
+    heatmap.updateVis();
+  });
 
 // Filter by Age
 d3.select("#slider").on("change", function () {
@@ -232,25 +235,36 @@ d3.select("#slider").on("change", function () {
   heatmap.updateVis();
 });
 
-// Filter by Gender
-// d3.select("#gender-Button").on("change", function() {
-//   const selected = d3.select(this).property("value");
-//   console.log(selected);
-//   switch (selected) {
-//     case "male":
-//       heatmap.data.forEach(genre => {
-//         genre.values.filter(d => d.gender == 0);
-//       });
-//     case "female":
-//       heatmap.data.forEach(genre => {
-//           genre.values.filter(d => d.gender == 1);
-//       });
-//     case "both":
-//       heatmap.data.forEach(genre => {
-//         genre.values.filter(d => d.gender == 0);
-//       });
-//   }
-// })
+//Filter by Gender
+d3.select("#gender-Button").on("change", filterGenderOnChange);
+
+function filterGender() {
+    const selected = d3.select("#gender-Button").select('input[name="gender"]:checked').node().value;
+    let filteredData;
+    let mediaArr = (heatmap.media == "movies") ? movieGenres : bookGenres;
+    switch (selected) {
+      case "male":
+        filteredData = computeAggregatedData(mediaArr, data.filter((item) => item.Gender == 0));
+        console.log(filteredData);
+        break;
+      case "female":
+        filteredData = computeAggregatedData(mediaArr, data.filter((item) => item.Gender == 1));
+        console.log(data.filter((item) => item.Gender == 1));
+        break;
+      case "both":
+        filteredData = computeAggregatedData(mediaArr, data);
+        break;
+      default:
+        filteredData = computeAggregatedData(mediaArr, data);
+        break;
+    }
+    heatmap.data = filteredData;
+}
+
+function filterGenderOnChange() {
+  filterGender();
+  heatmap.updateVis();
+}
 
 function getHighestScoringTrait(trait, groupedData) {
   let sums = [];
@@ -271,17 +285,17 @@ function getHighestScoringTrait(trait, groupedData) {
   return sums;
 }
 
-function filterGenderData() {
-  const gender = d3.select('input[name="gender"]:checked').property("value");
-  let tempData;
+// function filterGenderData() {
+//   const gender = d3.select('input[name="gender"]:checked').property("value");
+//   let tempData;
 
-  // if (gender == "male") {
-  //   tempData = globaldata.filter(d => d[gender] == 1);
-  // } else if (gender == "female") {
-  //   tempData = globaldata.filter(d => d[gender] == 2);
-  // }
-  console.log(tempData);
-}
+//   // if (gender == "male") {
+//   //   tempData = globaldata.filter(d => d[gender] == 1);
+//   // } else if (gender == "female") {
+//   //   tempData = globaldata.filter(d => d[gender] == 2);
+//   // }
+//   console.log(tempData);
+// }
 
 // Event listener to the radio button
-d3.select("#gender-Button").on("change", filterGenderData);
+// d3.select("#gender-Button").on("change", filterGenderData);

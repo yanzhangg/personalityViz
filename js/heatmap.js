@@ -7,10 +7,10 @@ class Heatmap {
   constructor(_config, _data, _trait, _media) {
     this.config = {
       parentElement: _config.parentElement,
-      containerWidth: _config.containerWidth || 1200,
+      containerWidth: _config.containerWidth || 1300,
       containerHeight: _config.containerHeight || 1000,
       tooltipPadding: 15,
-      margin: _config.margin || { top: 50, right: 50, bottom: 250, left: 120 },
+      margin: _config.margin || { top: 50, right: 200, bottom: 100, left: 150 },
       legendWidth: 160,
       legendBarHeight: 10,
     };
@@ -68,8 +68,8 @@ class Heatmap {
       .data(keys)
       .enter()
       .append("rect")
-        .attr("x", 10)
-        .attr("y", function(d,i) { return 100 + i*(25) + 700})
+        .attr("x", 1010)
+        .attr("y", function(d,i) { return 30 + i*(25)})
         .attr("width", 20)
         .attr("height", 20)
         .style("fill", function(d){ return vis.legendScale(d)})
@@ -78,8 +78,8 @@ class Heatmap {
         .data(keys)
         .enter()
         .append("text")
-        .attr("x", 30 + 20*1.3)
-        .attr("y", function(d,i){ return 100 + i*(25) + (10) + 700}) 
+        .attr("x", 1010 + 20*1.3)
+        .attr("y", function(d,i){ return 30 + i*(25) + (10)}) 
         .style("fill", 'black')
         .text(function(d){ return d})
         .attr("text-anchor", "left")
@@ -88,8 +88,8 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "legend-title")
-      .attr("y", function(d,i) { return 100 + i*(25) + 670})
-      .attr("x", 120)
+      .attr("y", function(d,i) { return 5 + i*(25)})
+      .attr("x", 1130)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Media Preference");
@@ -121,8 +121,8 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 750)
-      .attr("x", 600)
+      .attr("y", 900)
+      .attr("x", 530)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Personality Score");
@@ -139,8 +139,8 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 730)
-      .attr("x", 150)
+      .attr("y", 880)
+      .attr("x", 120)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text(`Extremely Low`);
@@ -148,46 +148,11 @@ class Heatmap {
     vis.chart
       .append("text")
       .attr("class", "axis-title")
-      .attr("y", 730)
-      .attr("x", 1000)
+      .attr("y", 880)
+      .attr("x", 930)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text(`Extremely High`);
-
-    // Legend
-    
-    // vis.legend = vis.svg
-    //     .append("g")
-    //     .attr(
-    //       "transform",
-    //       `translate(${
-    //         vis.config.containerWidth -
-    //         vis.config.legendWidth -
-    //         vis.config.margin.right
-    //       },0)`
-    //     );
-
-    // vis.legendColorGradient = vis.legend
-    //   .append("defs")
-    //   .append("linearGradient")
-    //   .attr("id", "linear-gradient");
-
-    // vis.legendColorRamp = vis.legend
-    //   .append("rect")
-    //   .attr("width", vis.config.legendWidth)
-    //   .attr("height", vis.config.legendBarHeight)
-    //   .attr("fill", "url(#linear-gradient)");
-
-    // vis.xLegendScale = d3.scaleQuantize().range([0, vis.config.legendWidth]);
-
-    // vis.xLegendAxis = d3
-    //   .axisBottom(vis.xLegendScale)
-    //   .tickSize(vis.config.legendBarHeight + 3)
-    //   .tickFormat(d3.format("d"));
-
-    // vis.xLegendAxisG = vis.legend
-    //   .append("g")
-    //   .attr("class", "axis x-axis legend-axis");
 
     vis.updateVis();
   }
@@ -216,14 +181,13 @@ class Heatmap {
          min = d_min;
       }
     });
-
+   
     // Set the scales for input domain
     vis.colorScale.domain([1, 5]);
     vis.xScale.domain([min, max+1]);
     vis.yScale.domain((vis.media == "movies") ? movieGenres : bookGenres);
 
     vis.renderVis();
-    vis.renderLegend();
   }
   /**
    * Bind data to visual elements.
@@ -243,8 +207,6 @@ class Heatmap {
     // Enter + update
     rowEnter
       .merge(row)
-      // .transition()
-      // .duration(1000)
       .attr("transform", (d) => `translate(0,${vis.yScale(vis.yValue(d))})`);
 
     // Exit
@@ -291,44 +253,5 @@ class Heatmap {
     // Update axis
     vis.xAxisG.call(vis.xAxis);
     vis.yAxisG.call(vis.yAxis);
-    
-    // vis.chart.select('.legendLinear')
-    // .call(vis.legendLinear);
   }
-
-  /**
-   * Update colour legend
-   */
-    renderLegend() {
-      const vis = this;
-
-      // Add stops to the gradient
-      // vis.legendColorGradient
-      //   .selectAll("stop")
-      //   .data(vis.legendScale.range())
-      //   .join("stop")
-      //   .attr("offset", (d, i) => i / (vis.legendScale.range().length - 1))
-      //   .attr("stop-color", (d) => d);
-
-      // vis.legendColorGradient
-      //   .style("fill", function(d,i) {
-      //     return vis.legendScale(i);
-      //   })
-
-      // Set x-scale and reuse colour-scale because they share the same domain
-      // Round values using `nice()` to make them easier to read.
-      // vis.xLegendScale.domain(vis.legendScale.domain()).nice();
-      // const extent = vis.xLegendScale.domain();
-
-      // // Manually calculate tick values
-      // vis.xLegendAxis.tickValues([
-      //   extent[0],
-      // parseInt(extent[1] / 3),
-      // parseInt((extent[1] / 3) * 2),
-      // extent[1]
-      // ]);
-
-      // Update legend axis
-      //vis.xLegendAxisG.call(vis.xLegendAxis);
-    }
 }

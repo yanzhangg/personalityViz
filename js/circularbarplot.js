@@ -8,14 +8,14 @@ class CircularBarplot {
         this.config = {
             parentElement: _config.parentElement,
             margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 50 },
-            containerWidth: _config.containerWidth || 500,
-            containerHeight: _config.containerHeight || 500,
+            containerWidth: _config.containerWidth || 400,
+            containerHeight: _config.containerHeight || 400,
             // margin: _config.margin || { top: 100, right: 0, bottom: 0, left: 0 },
             // containerWidth: _config.containerWidth || 800 - _config.margin.left - _config.margin.right,
             // containerHeight: _config.containerHeight || 800 - _config.margin.top - _config.margin.bottom,
             tooltipPadding: 15,
             innerRadius: 80,
-            outerRadius: 250
+            outerRadius: 200
         };
         this.data = _data;
         this.name = _name;

@@ -8,10 +8,10 @@
 </head>
 <body>    
     <!-- Add HTML content, SVG drawing area, ... -->
-    <h1 style="padding-left: 20px">The Big Five Personality Traits & Media Preferences</h1>
+    <h1>The Big Five Personality Traits & Media Preferences</h1>
 
     <div class="filters">
-        <div style="padding-left: 20px">Filter by Personality Trait:
+        <div style="padding-left: 20px"><b>Filter by Personality Trait: </b>
             <select id="trait-selector">
                 <option value="ipip_O">Openness</option>
                 <option value="ipip_C">Conscientiousness</option>
@@ -23,20 +23,20 @@
 
         <!-- Radio button: one item selected only -->
         <br>
-        <div id="media-button" style="padding-left: 20px">
+        <div id="media-button" style="padding-left: 40px">
             <b>Media Type:</b>
             <br>
             <input type="radio" name="media" value="movies" checked> Movies<br>
             <input type="radio" name="media" value="books"> Books<br>
         </div>
-        <div id="gender-Button" style="padding-left: 20px">
+        <div id="gender-Button" style="padding-left: 30px">
             <b>Gender:</b>
             <br>
             <input type="radio" name="gender" value="male"> Male<br>
             <input type="radio" name="gender" value="female"> Female<br>
             <input type="radio" name="gender" value="both" checked> Both<br>
         </div>
-        <div>
+        <div style="padding-left: 40px; padding-top: 20px">
             <label for="slider"><b>Age:</b> <span id="age-value">35</span></label>
             <input type="range" min="18" value="35" max="35" id="slider">
         </div>
@@ -44,10 +44,12 @@
 
     <div class="container">
         <div><svg id="heatmap"></svg></div>
-        <div class="barplots">
+        <div class="barplots-1">
             <div><svg id="o-circularbarplot"></svg></div>
             <div><svg id="c-circularbarplot"></svg></div>
             <div><svg id="e-circularbarplot"></svg></div>
+        </div>
+        <div class="barplots-2">
             <div><svg id="a-circularbarplot"></svg></div>
             <div><svg id="n-circularbarplot"></svg></div>
         </div>
