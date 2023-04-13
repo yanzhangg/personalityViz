@@ -1,4 +1,4 @@
-# D3 Project Starter Template
+# D3 Project: What Your Personality Says About Your Media Preferences
 
 # References
 
