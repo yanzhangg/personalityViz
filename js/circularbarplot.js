@@ -4,7 +4,7 @@ class CircularBarplot {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data, _name) {
+    constructor(_config, _data, _name, _highlightedTrait) {
         this.config = {
             parentElement: _config.parentElement,
             margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 50 },
@@ -19,6 +19,7 @@ class CircularBarplot {
         };
         this.data = _data;
         this.name = _name;
+        this.highlightedTrait = _highlightedTrait;
         this.initVis();
     }
 
@@ -121,7 +122,24 @@ class CircularBarplot {
             .on("mouseleave", () => {
             d3.select("#tooltip").style("display", "none");
             });
-            
+
+        const bars = vis.chart
+            .selectAll(".path")
+            .attr("opacity", d => {
+                if (vis.highlightedTrait == vis.name) {
+                    return '1.0';
+                } else {
+                    return '0.7';
+                }
+            })
+            .attr("stroke", d => {
+                if (vis.highlightedTrait == vis.name) {
+                    return '#333';
+                } else {
+                    return 'none';
+                }
+            })
+
 
         // Add genre labels
         vis.chart.append("g")

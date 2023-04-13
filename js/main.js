@@ -57,7 +57,8 @@ let heatmap,
   cCircularBarplot,
   eCircularBarplot,
   aCircularBarplot,
-  nCircularBarplot;
+  nCircularBarplot,
+  highlightedTrait;
 
 /**
  * Load data from CSV file asynchronously and render charts
@@ -121,13 +122,15 @@ d3.csv("data/data.csv")
       "movies"
     );
 
+    highlightedTrait = "Openness";
+
     // Initialize circular barplots
     oCircularBarplot = new CircularBarplot(
       {
         parentElement: "#o-circularbarplot",
       },
       getHighestScoringTrait("O", dataByHighestScoringTrait),
-      "Openness"
+      "Openness", highlightedTrait
     );
 
     cCircularBarplot = new CircularBarplot(
@@ -135,7 +138,7 @@ d3.csv("data/data.csv")
         parentElement: "#c-circularbarplot",
       },
       getHighestScoringTrait("C", dataByHighestScoringTrait),
-      "Conscientiousness"
+      "Conscientiousness", highlightedTrait
     );
 
     eCircularBarplot = new CircularBarplot(
@@ -143,7 +146,7 @@ d3.csv("data/data.csv")
         parentElement: "#e-circularbarplot",
       },
       getHighestScoringTrait("E", dataByHighestScoringTrait),
-      "Extraversion"
+      "Extraversion", highlightedTrait
     );
 
     aCircularBarplot = new CircularBarplot(
@@ -151,7 +154,7 @@ d3.csv("data/data.csv")
         parentElement: "#a-circularbarplot",
       },
       getHighestScoringTrait("A", dataByHighestScoringTrait),
-      "Agreeableness"
+      "Agreeableness", highlightedTrait
     );
 
     nCircularBarplot = new CircularBarplot(
@@ -159,7 +162,7 @@ d3.csv("data/data.csv")
         parentElement: "#n-circularbarplot",
       },
       getHighestScoringTrait("N", dataByHighestScoringTrait),
-      "Neuroticism"
+      "Neuroticism", highlightedTrait
     );
 
     heatmap.updateVis();
@@ -174,28 +177,63 @@ d3.csv("data/data.csv")
 // Filter by selection
 d3.select("#trait-selector").on("change", function () {
   const selected = d3.select(this).property("value");
-  console.log(selected);
+  
   switch (selected) {
     case "ipip_O":
       heatmap.trait = "ipip_O";
+      oCircularBarplot.highlightedTrait = "Openness";
+      cCircularBarplot.highlightedTrait = "Openness";
+      eCircularBarplot.highlightedTrait = "Openness";
+      aCircularBarplot.highlightedTrait = "Openness";
+      nCircularBarplot.highlightedTrait = "Openness";
       break;
     case "ipip_C":
       heatmap.trait = "ipip_C";
+      oCircularBarplot.highlightedTrait = "Conscientiousness";
+      cCircularBarplot.highlightedTrait = "Conscientiousness";
+      eCircularBarplot.highlightedTrait = "Conscientiousness";
+      aCircularBarplot.highlightedTrait = "Conscientiousness";
+      nCircularBarplot.highlightedTrait = "Conscientiousness";
       break;
     case "ipip_E":
       heatmap.trait = "ipip_E";
+      oCircularBarplot.highlightedTrait = "Extraversion";
+      cCircularBarplot.highlightedTrait = "Extraversion";
+      eCircularBarplot.highlightedTrait = "Extraversion";
+      aCircularBarplot.highlightedTrait = "Extraversion";
+      nCircularBarplot.highlightedTrait = "Extraversion";
       break;
     case "ipip_A":
       heatmap.trait = "ipip_A";
+      oCircularBarplot.highlightedTrait = "Agreeableness";
+      cCircularBarplot.highlightedTrait = "Agreeableness";
+      eCircularBarplot.highlightedTrait = "Agreeableness";
+      aCircularBarplot.highlightedTrait = "Agreeableness";
+      nCircularBarplot.highlightedTrait = "Agreeableness";
       break;
     case "ipip_N":
       heatmap.trait = "ipip_N";
+      oCircularBarplot.highlightedTrait = "Neuroticism";
+      cCircularBarplot.highlightedTrait = "Neuroticism";
+      eCircularBarplot.highlightedTrait = "Neuroticism";
+      aCircularBarplot.highlightedTrait = "Neuroticism";
+      nCircularBarplot.highlightedTrait = "Neuroticism";
       break;
     default:
       heatmap.trait = "ipip_O";
+      oCircularBarplot.highlightedTrait = "Openness";
+      cCircularBarplot.highlightedTrait = "Openness";
+      eCircularBarplot.highlightedTrait = "Openness";
+      aCircularBarplot.highlightedTrait = "Openness";
+      nCircularBarplot.highlightedTrait = "Openness";
       break;
   }
   heatmap.updateVis();
+  oCircularBarplot.updateVis();
+  cCircularBarplot.updateVis();
+  eCircularBarplot.updateVis();
+  aCircularBarplot.updateVis();
+  nCircularBarplot.updateVis();
 });
 
 
