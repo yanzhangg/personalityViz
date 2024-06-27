@@ -1,5 +1,7 @@
 # D3 Project: What Your Personality Says About Your Media Preferences
 
+![Alt text](thumbnail.png?raw=true "Title")
+
 # References
 
 - https://d3-graph-gallery.com/graph/connectedscatter_multi.html
